@@ -1,3 +1,0 @@
-## Fortune Forge
-
-In progress
