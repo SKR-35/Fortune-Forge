@@ -547,10 +547,178 @@ ENGLISH_HUMOROUS = ContentPack(
     ),
 )
 
+ENGLISH_PESSIMISTIC = ContentPack(
+    language=Language.ENGLISH,
+    mood=Mood.PESSIMISTIC,
+    templates=(
+        TemplateContent(
+            template="{prediction}; {downside}.",
+            components={
+                "prediction": (
+                    ComponentValue("Good news may arrive"),
+                    ComponentValue("A solution may appear"),
+                    ComponentValue("A useful opportunity may come"),
+                    ComponentValue("Someone may finally agree with you"),
+                    ComponentValue("Your plan may begin to work"),
+                    ComponentValue("A small success may be close"),
+                    ComponentValue("A promising idea may survive"),
+                    ComponentValue("A quiet improvement may begin"),
+                ),
+                "downside": (
+                    ComponentValue("probably after it would have been most useful"),
+                    ComponentValue("expect additional paperwork"),
+                    ComponentValue("the timing may still be disappointing"),
+                    ComponentValue("someone will likely complicate it"),
+                    ComponentValue("there may be conditions attached"),
+                    ComponentValue("do not celebrate too early"),
+                    ComponentValue("the easy part is probably over"),
+                    ComponentValue("some patience will still be required"),
+                ),
+            },
+        ),
+        TemplateContent(
+            template="{event} will remind you that {lesson}.",
+            components={
+                "event": (
+                    ComponentValue("A simple task"),
+                    ComponentValue("A minor delay"),
+                    ComponentValue("An ordinary conversation"),
+                    ComponentValue("A missing detail"),
+                    ComponentValue("A small mistake"),
+                    ComponentValue("An unexpected request"),
+                    ComponentValue("A routine decision"),
+                    ComponentValue("A harmless assumption"),
+                ),
+                "lesson": (
+                    ComponentValue("nothing is ever quite as simple as advertised"),
+                    ComponentValue("timing has a sense of humor"),
+                    ComponentValue("confidence is not evidence"),
+                    ComponentValue("small problems enjoy company"),
+                    ComponentValue("the obvious answer sometimes arrives last"),
+                    ComponentValue("plans rarely read their own instructions"),
+                    ComponentValue("patience is usually requested without notice"),
+                    ComponentValue("certainty tends to expire quickly"),
+                ),
+            },
+        ),
+        TemplateContent(
+            template="{advice}; {warning}.",
+            components={
+                "advice": (
+                    ComponentValue("Lower your expectations slightly"),
+                    ComponentValue("Keep a backup plan nearby"),
+                    ComponentValue("Double-check the simple part"),
+                    ComponentValue("Leave extra time"),
+                    ComponentValue("Read the fine print"),
+                    ComponentValue("Prepare for one more step"),
+                    ComponentValue("Keep your confidence flexible"),
+                    ComponentValue("Do not assume the easy option is available"),
+                ),
+                "warning": (
+                    ComponentValue("today may insist on being educational"),
+                    ComponentValue("the details may be less encouraging"),
+                    ComponentValue("someone may change the plan"),
+                    ComponentValue("the shortcut may take longer"),
+                    ComponentValue("the obvious solution may be unavailable"),
+                    ComponentValue("a small inconvenience may become ambitious"),
+                    ComponentValue("your schedule may disagree"),
+                    ComponentValue("the universe has not confirmed anything"),
+                ),
+            },
+        ),
+        TemplateContent(
+            template="Your {quality} may be tested by {obstacle}.",
+            components={
+                "quality": (
+                    ComponentValue("patience"),
+                    ComponentValue("optimism"),
+                    ComponentValue("good judgment"),
+                    ComponentValue("sense of humor"),
+                    ComponentValue("attention to detail"),
+                    ComponentValue("ability to improvise"),
+                    ComponentValue("careful planning"),
+                    ComponentValue("confidence"),
+                ),
+                "obstacle": (
+                    ComponentValue("something remarkably unimportant"),
+                    ComponentValue("an avoidable delay"),
+                    ComponentValue("a confusing instruction"),
+                    ComponentValue("someone else's certainty"),
+                    ComponentValue("a problem that nearly solved itself"),
+                    ComponentValue("a missing piece of information"),
+                    ComponentValue("an inconvenient coincidence"),
+                    ComponentValue("a task with one step too many"),
+                ),
+            },
+        ),
+        TemplateContent(
+            template="{situation} may turn out to be {outcome}.",
+            components={
+                "situation": (
+                    ComponentValue("The promising option"),
+                    ComponentValue("The easy solution"),
+                    ComponentValue("The sensible plan"),
+                    ComponentValue("The quick answer"),
+                    ComponentValue("The obvious choice"),
+                    ComponentValue("The convenient route"),
+                    ComponentValue("The simple explanation"),
+                    ComponentValue("The reassuring message"),
+                ),
+                "outcome": (
+                    ComponentValue("more complicated than expected"),
+                    ComponentValue("less helpful than advertised"),
+                    ComponentValue("temporarily unavailable"),
+                    ComponentValue("someone else's problem first"),
+                    ComponentValue("only mostly correct"),
+                    ComponentValue("surprisingly expensive"),
+                    ComponentValue("dependent on one missing detail"),
+                    ComponentValue("the beginning of another question"),
+                ),
+            },
+        ),
+        TemplateContent(
+            template="{time}, {problem} may {result}.",
+            components={
+                "time": (
+                    ComponentValue("Soon"),
+                    ComponentValue("Before long"),
+                    ComponentValue("Later than expected"),
+                    ComponentValue("At an inconvenient moment"),
+                    ComponentValue("When things seem settled"),
+                    ComponentValue("Just as you relax"),
+                    ComponentValue("After unnecessary discussion"),
+                    ComponentValue("When you think you are finished"),
+                ),
+                "problem": (
+                    ComponentValue("a small complication"),
+                    ComponentValue("an overlooked detail"),
+                    ComponentValue("a minor delay"),
+                    ComponentValue("an unexpected question"),
+                    ComponentValue("a forgotten task"),
+                    ComponentValue("a routine problem"),
+                    ComponentValue("a harmless misunderstanding"),
+                    ComponentValue("a last-minute change"),
+                ),
+                "result": (
+                    ComponentValue("require more patience than expected"),
+                    ComponentValue("take longer than it should"),
+                    ComponentValue("create one additional problem"),
+                    ComponentValue("interrupt an otherwise reasonable day"),
+                    ComponentValue("need an unnecessarily careful answer"),
+                    ComponentValue("make the obvious solution less obvious"),
+                    ComponentValue("arrive with poor timing"),
+                    ComponentValue("refuse to stay small"),
+                ),
+            },
+        ),
+    ),
+)
+
 
 CONTENT_PACKS: dict[tuple[Language, Mood], ContentPack] = {
     (Language.ENGLISH, Mood.OPTIMISTIC): ENGLISH_OPTIMISTIC,
     (Language.ENGLISH, Mood.HUMOROUS): ENGLISH_HUMOROUS,
+    (Language.ENGLISH, Mood.PESSIMISTIC): ENGLISH_PESSIMISTIC,
 }
 
 
