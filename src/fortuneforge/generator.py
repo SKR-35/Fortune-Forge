@@ -3,10 +3,12 @@
 from itertools import product
 from random import Random
 
+from fortuneforge.compatibility import candidate_is_compatible
 from fortuneforge.content import ContentPack, TemplateContent, get_content_pack
 from fortuneforge.content_validation import validate_content_pack
 from fortuneforge.domain import GenerationRequest
 from fortuneforge.normalization import normalize_fortune
+from fortuneforge.quality import is_quality_candidate
 
 
 class GenerationError(RuntimeError):
@@ -25,7 +27,18 @@ def _expand_template(template_content: TemplateContent) -> list[str]:
     fortunes: list[str] = []
 
     for values in product(*value_groups):
-        replacements = dict(zip(field_names, values, strict=True))
+        if not candidate_is_compatible(values):
+            continue
+
+        replacements = {
+            field_name: component_value.text
+            for field_name, component_value in zip(
+                field_names,
+                values,
+                strict=True,
+            )
+        }
+
         fortunes.append(template_content.template.format(**replacements))
 
     return fortunes
@@ -37,6 +50,9 @@ def build_candidate_pool(content_pack: ContentPack) -> list[str]:
 
     for template_content in content_pack.templates:
         for fortune in _expand_template(template_content):
+            if not is_quality_candidate(fortune):
+                continue
+
             normalized = normalize_fortune(fortune)
 
             if normalized:
