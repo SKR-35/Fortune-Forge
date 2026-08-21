@@ -2,7 +2,7 @@
 
 import pytest
 
-from fortuneforge.content import ContentPack, TemplateContent
+from fortuneforge.content import ComponentValue, ContentPack, TemplateContent
 from fortuneforge.content_validation import ContentValidationError
 from fortuneforge.domain import GenerationRequest, Language, Mood
 from fortuneforge.generator import (
@@ -21,8 +21,12 @@ def test_candidate_pool_expands_reusable_components() -> None:
             TemplateContent(
                 template="{subject} brings {result}.",
                 components={
-                    "subject": ("Patience", "Curiosity"),
-                    "result": ("luck", "clarity"),
+                    "subject": (ComponentValue("Patience"),
+                    ComponentValue("Curiosity"),
+                    ),
+                    "result": (ComponentValue("luck"),
+                    ComponentValue("clarity"),
+                    ),
                 },
             ),
         ),
@@ -47,9 +51,9 @@ def test_candidate_pool_removes_normalized_duplicates() -> None:
                 template="{text}",
                 components={
                     "text": (
-                        "Good fortune awaits.",
-                        "good fortune awaits.",
-                        "Good   fortune awaits.",
+                        ComponentValue("Good fortune awaits."),
+                        ComponentValue("good fortune awaits."),
+                        ComponentValue("Good   fortune awaits."),
                     ),
                 },
             ),
@@ -129,7 +133,7 @@ def test_generation_fails_when_capacity_is_insufficient(
             TemplateContent(
                 template="{result}",
                 components={
-                    "result": ("One fortune.", "Another fortune."),
+                    "result": (ComponentValue("One fortune."), ComponentValue("Another fortune.")),
                 },
             ),
         ),
@@ -171,7 +175,7 @@ def test_generation_rejects_structurally_invalid_content(
             TemplateContent(
                 template="{subject} brings {missing}.",
                 components={
-                    "subject": ("Patience",),
+                    "subject": (ComponentValue("Patience"),),
                 },
             ),
         ),
