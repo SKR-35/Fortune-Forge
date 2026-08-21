@@ -23,9 +23,7 @@ def parse_quantity(value: str) -> int:
         raise ValidationError("Quantity must be a whole number.") from exc
 
     if quantity < MIN_QUANTITY or quantity > MAX_QUANTITY:
-        raise ValidationError(
-            f"Quantity must be between {MIN_QUANTITY} and {MAX_QUANTITY}."
-        )
+        raise ValidationError(f"Quantity must be between {MIN_QUANTITY} and {MAX_QUANTITY}.")
 
     return quantity
 

@@ -21,11 +21,13 @@ def test_candidate_pool_expands_reusable_components() -> None:
             TemplateContent(
                 template="{subject} brings {result}.",
                 components={
-                    "subject": (ComponentValue("Patience"),
-                    ComponentValue("Curiosity"),
+                    "subject": (
+                        ComponentValue("Patience"),
+                        ComponentValue("Curiosity"),
                     ),
-                    "result": (ComponentValue("luck"),
-                    ComponentValue("clarity"),
+                    "result": (
+                        ComponentValue("luck"),
+                        ComponentValue("clarity"),
                     ),
                 },
             ),
@@ -164,7 +166,8 @@ def test_generation_returns_tuple() -> None:
     )
 
     assert isinstance(generate_batch(request), tuple)
-    
+
+
 def test_generation_rejects_structurally_invalid_content(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -18,9 +18,11 @@ from fortuneforge.domain import Language, Mood
 
 
 def test_get_template_fields_returns_all_referenced_fields() -> None:
-    assert get_template_fields(
-        "{time}, {event} will bring {result}."
-    ) == {"time", "event", "result"}
+    assert get_template_fields("{time}, {event} will bring {result}.") == {
+        "time",
+        "event",
+        "result",
+    }
 
 
 def test_template_without_fields_has_empty_field_set() -> None:
@@ -95,8 +97,9 @@ def test_template_rejects_blank_component_values(empty_value: str) -> None:
     template_content = TemplateContent(
         template="{subject} brings luck.",
         components={
-            "subject": (ComponentValue("Patience"), 
-            ComponentValue(empty_value),
+            "subject": (
+                ComponentValue("Patience"),
+                ComponentValue(empty_value),
             ),
         },
     )
@@ -144,7 +147,8 @@ def test_pack_accepts_multiple_valid_templates() -> None:
     )
 
     validate_content_pack(content_pack)
-    
+
+
 @pytest.mark.parametrize(
     "tag",
     [
@@ -173,7 +177,8 @@ def test_template_rejects_malformed_tags(tag: str) -> None:
         match="contains malformed tag",
     ):
         validate_template_content(template_content)
-        
+
+
 def test_template_accepts_valid_compatibility_tags() -> None:
     template_content = TemplateContent(
         template="{subject} brings luck.",

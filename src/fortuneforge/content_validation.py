@@ -31,16 +31,12 @@ def validate_template_content(template_content: TemplateContent) -> None:
     missing_components = template_fields - component_fields
     if missing_components:
         missing = ", ".join(sorted(missing_components))
-        raise ContentValidationError(
-            f"Template references missing component fields: {missing}."
-        )
+        raise ContentValidationError(f"Template references missing component fields: {missing}.")
 
     unused_components = component_fields - template_fields
     if unused_components:
         unused = ", ".join(sorted(unused_components))
-        raise ContentValidationError(
-            f"Template defines unused component fields: {unused}."
-        )
+        raise ContentValidationError(f"Template defines unused component fields: {unused}.")
 
     for field_name, values in template_content.components.items():
         if not values:
@@ -53,11 +49,11 @@ def validate_template_content(template_content: TemplateContent) -> None:
                 raise ContentValidationError(
                     f"Component field '{field_name}' contains an empty value."
                 )
-                
+
             for tag in value.tags:
                 if ":" not in tag:
                     raise ContentValidationError(
-                    f"Component field '{field_name}' contains malformed tag '{tag}'."
+                        f"Component field '{field_name}' contains malformed tag '{tag}'."
                     )
 
                 prefix, name = tag.split(":", 1)
