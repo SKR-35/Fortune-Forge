@@ -4,6 +4,7 @@ import pytest
 
 from fortuneforge.content import (
     ENGLISH_OPTIMISTIC,
+    ComponentValue,
     ContentPack,
     TemplateContent,
 )
@@ -47,7 +48,7 @@ def test_template_rejects_missing_component() -> None:
     template_content = TemplateContent(
         template="{subject} brings {result}.",
         components={
-            "subject": ("Patience",),
+            "subject": (ComponentValue("Patience"),),
         },
     )
 
@@ -62,8 +63,8 @@ def test_template_rejects_unused_component() -> None:
     template_content = TemplateContent(
         template="{subject} brings luck.",
         components={
-            "subject": ("Patience",),
-            "unused": ("clarity",),
+            "subject": (ComponentValue("Patience"),),
+            "unused": (ComponentValue("clarity"),),
         },
     )
 
@@ -94,7 +95,9 @@ def test_template_rejects_blank_component_values(empty_value: str) -> None:
     template_content = TemplateContent(
         template="{subject} brings luck.",
         components={
-            "subject": ("Patience", empty_value),
+            "subject": (ComponentValue("Patience"), 
+            ComponentValue(empty_value),
+            ),
         },
     )
 
@@ -127,17 +130,67 @@ def test_pack_accepts_multiple_valid_templates() -> None:
             TemplateContent(
                 template="{subject} przyniesie {result}.",
                 components={
-                    "subject": ("Cierpliwość",),
-                    "result": ("dobrą wiadomość",),
+                    "subject": (ComponentValue("Cierpliwość"),),
+                    "result": (ComponentValue("dobrą wiadomość"),),
                 },
             ),
             TemplateContent(
                 template="{time} pojawi się okazja.",
                 components={
-                    "time": ("Wkrótce",),
+                    "time": (ComponentValue("Wkrótce"),),
                 },
             ),
         ),
     )
 
     validate_content_pack(content_pack)
+    
+@pytest.mark.parametrize(
+    "tag",
+    [
+        "invalid",
+        "unknown:value",
+        "provides:",
+        "requires:",
+        "excludes:",
+    ],
+)
+def test_template_rejects_malformed_tags(tag: str) -> None:
+    template_content = TemplateContent(
+        template="{subject} brings luck.",
+        components={
+            "subject": (
+                ComponentValue(
+                    "Patience",
+                    frozenset({tag}),
+                ),
+            ),
+        },
+    )
+
+    with pytest.raises(
+        ContentValidationError,
+        match="contains malformed tag",
+    ):
+        validate_template_content(template_content)
+        
+def test_template_accepts_valid_compatibility_tags() -> None:
+    template_content = TemplateContent(
+        template="{subject} brings luck.",
+        components={
+            "subject": (
+                ComponentValue(
+                    "Patience",
+                    frozenset(
+                        {
+                            "provides:abstract",
+                            "requires:positive",
+                            "excludes:dark",
+                        }
+                    ),
+                ),
+            ),
+        },
+    )
+
+    validate_template_content(template_content)
