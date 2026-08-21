@@ -3,6 +3,7 @@
 import pytest
 
 from fortuneforge.content import ContentPack, TemplateContent
+from fortuneforge.content_validation import ContentValidationError
 from fortuneforge.domain import GenerationRequest, Language, Mood
 from fortuneforge.generator import (
     GenerationError,
@@ -159,3 +160,34 @@ def test_generation_returns_tuple() -> None:
     )
 
     assert isinstance(generate_batch(request), tuple)
+    
+def test_generation_rejects_structurally_invalid_content(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    invalid_pack = ContentPack(
+        language=Language.ENGLISH,
+        mood=Mood.OPTIMISTIC,
+        templates=(
+            TemplateContent(
+                template="{subject} brings {missing}.",
+                components={
+                    "subject": ("Patience",),
+                },
+            ),
+        ),
+    )
+
+    monkeypatch.setattr(
+        "fortuneforge.generator.get_content_pack",
+        lambda language, mood: invalid_pack,
+    )
+
+    request = GenerationRequest(
+        language=Language.ENGLISH,
+        mood=Mood.OPTIMISTIC,
+        quantity=1,
+        seed=42,
+    )
+
+    with pytest.raises(ContentValidationError):
+        generate_batch(request)
