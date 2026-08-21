@@ -1,7 +1,13 @@
 """Tests for FortuneForge content capacity analysis."""
 
 from fortuneforge.capacity import CapacityReport, analyze_capacity
-from fortuneforge.content import ENGLISH_OPTIMISTIC, ComponentValue, ContentPack, TemplateContent
+from fortuneforge.content import (
+    ENGLISH_HUMOROUS,
+    ENGLISH_OPTIMISTIC,
+    ComponentValue,
+    ContentPack,
+    TemplateContent,
+)
 from fortuneforge.domain import Language, Mood
 
 
@@ -84,5 +90,11 @@ def test_capacity_does_not_count_normalized_duplicates() -> None:
 
 def test_english_optimistic_supports_required_capacity() -> None:
     report = analyze_capacity(ENGLISH_OPTIMISTIC)
+
+    assert report.candidate_count >= 500
+
+
+def test_english_humorous_supports_required_capacity() -> None:
+    report = analyze_capacity(ENGLISH_HUMOROUS)
 
     assert report.candidate_count >= 500
