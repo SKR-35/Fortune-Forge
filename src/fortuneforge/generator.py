@@ -4,6 +4,7 @@ from itertools import product
 from random import Random
 
 from fortuneforge.content import ContentPack, TemplateContent, get_content_pack
+from fortuneforge.content_validation import validate_content_pack
 from fortuneforge.domain import GenerationRequest
 from fortuneforge.normalization import normalize_fortune
 
@@ -47,6 +48,7 @@ def build_candidate_pool(content_pack: ContentPack) -> list[str]:
 def generate_batch(request: GenerationRequest) -> tuple[str, ...]:
     """Generate a complete deterministic or unseeded fortune batch."""
     content_pack = get_content_pack(request.language, request.mood)
+    validate_content_pack(content_pack)
     candidates = build_candidate_pool(content_pack)
 
     if len(candidates) < request.quantity:
