@@ -225,9 +225,332 @@ ENGLISH_OPTIMISTIC = ContentPack(
     ),
 )
 
+ENGLISH_HUMOROUS = ContentPack(
+    language=Language.ENGLISH,
+    mood=Mood.HUMOROUS,
+    templates=(
+        # Fortune-cookie absurdity
+        TemplateContent(
+            template="{prediction}; {twist}.",
+            components={
+                "prediction": (
+                    ComponentValue("A mysterious opportunity is approaching"),
+                    ComponentValue("Good fortune is heading your way"),
+                    ComponentValue("An unexpected answer will soon appear"),
+                    ComponentValue("A bold decision is waiting for you"),
+                    ComponentValue("A pleasant surprise is getting closer"),
+                    ComponentValue("A lucky coincidence is on its way"),
+                    ComponentValue("An unusual invitation may arrive soon"),
+                    ComponentValue("Something unexpectedly useful will find you"),
+                ),
+                "twist": (
+                    ComponentValue("it may be lunch"),
+                    ComponentValue("keep the receipt"),
+                    ComponentValue("try to look surprised"),
+                    ComponentValue("tomorrow is also available"),
+                    ComponentValue("do not spend it all in one place"),
+                    ComponentValue("its timing remains suspicious"),
+                    ComponentValue("act like this was your plan"),
+                    ComponentValue("snacks may be involved"),
+                ),
+            },
+        ),
+        # Advice with a playful reversal
+        TemplateContent(
+            template="{advice}, except {exception}.",
+            components={
+                "advice": (
+                    ComponentValue("Trust your instincts"),
+                    ComponentValue("Follow your curiosity"),
+                    ComponentValue("Listen to your inner voice"),
+                    ComponentValue("Take the brave option"),
+                    ComponentValue("Believe in your judgment"),
+                    ComponentValue("Stay open to possibilities"),
+                    ComponentValue("Be generous with second chances"),
+                    ComponentValue("Keep an open mind"),
+                ),
+                "exception": (
+                    ComponentValue("when it recommends a third dessert"),
+                    ComponentValue("when you are looking for your keys"),
+                    ComponentValue("when online shopping is involved"),
+                    ComponentValue("when everyone else suddenly becomes very quiet"),
+                    ComponentValue('when the instructions say "easy assembly"'),
+                    ComponentValue("when your phone is at one percent"),
+                    ComponentValue('when someone says "this will only take a minute"'),
+                    ComponentValue("when the cat looks unusually confident"),
+                ),
+            },
+        ),
+        # Everyday objects
+        TemplateContent(
+            template="{object} may soon {action}.",
+            components={
+                "object": (
+                    ComponentValue("Your refrigerator"),
+                    ComponentValue("Your alarm clock"),
+                    ComponentValue("Your left shoe"),
+                    ComponentValue("Your favorite mug"),
+                    ComponentValue("The nearest chair"),
+                    ComponentValue("Your umbrella"),
+                    ComponentValue("Your house keys"),
+                    ComponentValue("The mysterious drawer everyone has"),
+                ),
+                "action": (
+                    ComponentValue("become unexpectedly important"),
+                    ComponentValue("question one of your recent decisions"),
+                    ComponentValue("know more than it is willing to admit"),
+                    ComponentValue("demand the respect it deserves"),
+                    ComponentValue("solve a problem nobody asked it to solve"),
+                    ComponentValue("remind you who is really in charge"),
+                    ComponentValue("appear exactly where you already looked"),
+                    ComponentValue("develop suspiciously strong opinions"),
+                ),
+            },
+        ),
+        # Social fortunes
+        TemplateContent(
+            template="{person}; {reveal}.",
+            components={
+                "person": (
+                    ComponentValue("Someone is thinking about you"),
+                    ComponentValue("A stranger may soon remember your face"),
+                    ComponentValue("An old friend may contact you"),
+                    ComponentValue("Someone nearby admires your confidence"),
+                    ComponentValue("A helpful person may appear unexpectedly"),
+                    ComponentValue("Someone may soon ask for your opinion"),
+                    ComponentValue("A familiar face may bring surprising news"),
+                    ComponentValue("Someone you trust may offer useful advice"),
+                ),
+                "reveal": (
+                    ComponentValue("they may also need a favor"),
+                    ComponentValue("pretend this prediction never happened"),
+                    ComponentValue("there is probably a story behind it"),
+                    ComponentValue("you are allowed to look mysterious"),
+                    ComponentValue("ask about the snacks before committing"),
+                    ComponentValue("choose your dramatic pause carefully"),
+                    ComponentValue("the details may be less impressive"),
+                    ComponentValue("nod wisely until more information arrives"),
+                ),
+            },
+        ),
+        # Food / fortune-cookie humor
+        TemplateContent(
+            template="{food_fortune}; {food_twist}.",
+            components={
+                "food_fortune": (
+                    ComponentValue("A delicious opportunity awaits"),
+                    ComponentValue("Your next meal may contain an important clue"),
+                    ComponentValue("Great wisdom will arrive around lunchtime"),
+                    ComponentValue("A snack may improve your next decision"),
+                    ComponentValue("Good news tastes better on a full stomach"),
+                    ComponentValue("A difficult problem may surrender to dessert"),
+                    ComponentValue("Your fortunes improve near baked goods"),
+                    ComponentValue("A wise choice may soon appear on a menu"),
+                ),
+                "food_twist": (
+                    ComponentValue("ordering two is still technically a choice"),
+                    ComponentValue("fortune cookies are rarely neutral witnesses"),
+                    ComponentValue("save room for unexpected developments"),
+                    ComponentValue("sharing remains optional"),
+                    ComponentValue("calories have declined to comment"),
+                    ComponentValue("the last piece knows who wants it"),
+                    ComponentValue("your future self supports this research"),
+                    ComponentValue("napkins may become strategically important"),
+                ),
+            },
+        ),
+        # Luck
+        TemplateContent(
+            template="{luck}; {caution}.",
+            components={
+                "luck": (
+                    ComponentValue("Your luck is changing"),
+                    ComponentValue("A lucky break may arrive soon"),
+                    ComponentValue("Fortune appears to be on your side"),
+                    ComponentValue("A small streak of luck is beginning"),
+                    ComponentValue("The odds may briefly favor you"),
+                    ComponentValue("Something fortunate is quietly developing"),
+                    ComponentValue("A coincidence may work in your favor"),
+                    ComponentValue("Today has unusual potential"),
+                ),
+                "caution": (
+                    ComponentValue("keep the receipt"),
+                    ComponentValue("do not frighten it away"),
+                    ComponentValue("avoid explaining it too confidently"),
+                    ComponentValue("results may vary after midnight"),
+                    ComponentValue("the universe dislikes showing off"),
+                    ComponentValue("try not to immediately test your limits"),
+                    ComponentValue("use responsibly"),
+                    ComponentValue("no warranty is implied"),
+                ),
+            },
+        ),
+        # Daily-life absurdity
+        TemplateContent(
+            template="{event} will teach you {lesson}.",
+            components={
+                "event": (
+                    ComponentValue("A missing sock"),
+                    ComponentValue("An unexpected nap"),
+                    ComponentValue("A stubborn jar lid"),
+                    ComponentValue("A wrong turn"),
+                    ComponentValue("An unusually long queue"),
+                    ComponentValue("A forgotten umbrella"),
+                    ComponentValue("A mysterious noise"),
+                    ComponentValue("A door that refuses to cooperate"),
+                ),
+                "lesson": (
+                    ComponentValue("that confidence is not the same as a plan"),
+                    ComponentValue("the value of selective optimism"),
+                    ComponentValue("why patience has a sense of humor"),
+                    ComponentValue("that dignity is occasionally optional"),
+                    ComponentValue("the importance of pretending this was intentional"),
+                    ComponentValue("that small victories deserve recognition"),
+                    ComponentValue("why backup plans need backup plans"),
+                    ComponentValue("that timing is mostly a rumor"),
+                ),
+            },
+        ),
+        # Limited work/technology humor — deliberately only one family
+        TemplateContent(
+            template="{work_event}; {work_twist}.",
+            components={
+                "work_event": (
+                    ComponentValue("Your next meeting may be surprisingly useful"),
+                    ComponentValue("A suspiciously short email may arrive"),
+                    ComponentValue("Your next spreadsheet may contain good news"),
+                    ComponentValue("A technical problem may solve itself"),
+                    ComponentValue("Someone may finally read the instructions"),
+                    ComponentValue("Your inbox may briefly show mercy"),
+                    ComponentValue("A deadline may become unexpectedly reasonable"),
+                    ComponentValue("The printer may cooperate"),
+                ),
+                "work_twist": (
+                    ComponentValue("document this rare event"),
+                    ComponentValue("remain calm"),
+                    ComponentValue("nobody needs to know how surprised you are"),
+                    ComponentValue("do not make sudden movements"),
+                    ComponentValue("enjoy it before the next notification"),
+                    ComponentValue("coffee may still be required"),
+                    ComponentValue("this phenomenon may not be reproducible"),
+                    ComponentValue("scientists remain cautious"),
+                ),
+            },
+        ),
+        # Compatibility-aware humor:
+        # punchlines only combine with matching setup categories.
+        TemplateContent(
+            template="{setup}; {punchline}.",
+            components={
+                "setup": (
+                    ComponentValue(
+                        "Your pet may understand more than you think",
+                        frozenset({"provides:animal"}),
+                    ),
+                    ComponentValue(
+                        "An animal may influence your next decision",
+                        frozenset({"provides:animal"}),
+                    ),
+                    ComponentValue(
+                        "The nearest cat appears to know something",
+                        frozenset({"provides:animal"}),
+                    ),
+                    ComponentValue(
+                        "Your next meal may reveal hidden wisdom",
+                        frozenset({"provides:food"}),
+                    ),
+                    ComponentValue(
+                        "Dessert may play an important role today",
+                        frozenset({"provides:food"}),
+                    ),
+                    ComponentValue(
+                        "A snack may soon change your perspective",
+                        frozenset({"provides:food"}),
+                    ),
+                    ComponentValue(
+                        "The weather has plans for you",
+                        frozenset({"provides:weather"}),
+                    ),
+                    ComponentValue(
+                        "An unexpected breeze may bring clarity",
+                        frozenset({"provides:weather"}),
+                    ),
+                    ComponentValue(
+                        "Today's forecast contains a surprise",
+                        frozenset({"provides:weather"}),
+                    ),
+                    ComponentValue(
+                        "Sleep may answer a question you have been avoiding",
+                        frozenset({"provides:sleep"}),
+                    ),
+                    ComponentValue(
+                        "Your pillow may offer excellent advice tonight",
+                        frozenset({"provides:sleep"}),
+                    ),
+                    ComponentValue(
+                        "A nap may become unexpectedly productive",
+                        frozenset({"provides:sleep"}),
+                    ),
+                ),
+                "punchline": (
+                    ComponentValue(
+                        "consider negotiating with treats",
+                        frozenset({"requires:animal"}),
+                    ),
+                    ComponentValue(
+                        "do not let it manage your finances",
+                        frozenset({"requires:animal"}),
+                    ),
+                    ComponentValue(
+                        "its confidence is not evidence",
+                        frozenset({"requires:animal"}),
+                    ),
+                    ComponentValue(
+                        "take notes before ordering seconds",
+                        frozenset({"requires:food"}),
+                    ),
+                    ComponentValue(
+                        "the sauce may contain additional information",
+                        frozenset({"requires:food"}),
+                    ),
+                    ComponentValue(
+                        "research may require another serving",
+                        frozenset({"requires:food"}),
+                    ),
+                    ComponentValue(
+                        "carry an umbrella and lower your expectations",
+                        frozenset({"requires:weather"}),
+                    ),
+                    ComponentValue(
+                        "the clouds refuse to provide details",
+                        frozenset({"requires:weather"}),
+                    ),
+                    ComponentValue(
+                        "meteorology denies responsibility",
+                        frozenset({"requires:weather"}),
+                    ),
+                    ComponentValue(
+                        "consult it again after eight hours",
+                        frozenset({"requires:sleep"}),
+                    ),
+                    ComponentValue(
+                        "answers may arrive with drool",
+                        frozenset({"requires:sleep"}),
+                    ),
+                    ComponentValue(
+                        "do not schedule anything important during the experiment",
+                        frozenset({"requires:sleep"}),
+                    ),
+                ),
+            },
+        ),
+    ),
+)
+
 
 CONTENT_PACKS: dict[tuple[Language, Mood], ContentPack] = {
     (Language.ENGLISH, Mood.OPTIMISTIC): ENGLISH_OPTIMISTIC,
+    (Language.ENGLISH, Mood.HUMOROUS): ENGLISH_HUMOROUS,
 }
 
 
