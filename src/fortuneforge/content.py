@@ -1,16 +1,23 @@
 """Content definitions used by the FortuneForge generator."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from fortuneforge.domain import Language, Mood
 
+
+@dataclass(frozen=True)
+class ComponentValue:
+    """One reusable phrase value with optional compatibility tags."""
+
+    text: str
+    tags: frozenset[str] = field(default_factory=frozenset)
 
 @dataclass(frozen=True)
 class TemplateContent:
     """Reusable components for one controlled fortune template."""
 
     template: str
-    components: dict[str, tuple[str, ...]]
+    components: dict[str, tuple[ComponentValue, ...]]
 
 
 @dataclass(frozen=True)
@@ -30,19 +37,19 @@ ENGLISH_OPTIMISTIC = ContentPack(
             template="{time}, {event} will bring you {result}.",
             components={
                 "time": (
-                    "Soon",
-                    "Before long",
-                    "When you least expect it",
+                    ComponentValue("Soon"),
+                    ComponentValue("Before long"),
+                    ComponentValue("When you least expect it"),
                 ),
                 "event": (
-                    "a small opportunity",
-                    "an unexpected conversation",
-                    "a patient decision",
+                    ComponentValue("a small opportunity"),
+                    ComponentValue("an unexpected conversation"),
+                    ComponentValue("a patient decision"),
                 ),
                 "result": (
-                    "good news",
-                    "a welcome surprise",
-                    "a reason to smile",
+                    ComponentValue("good news"),
+                    ComponentValue("a welcome surprise"),
+                    ComponentValue("a reason to smile"),
                 ),
             },
         ),
@@ -50,14 +57,14 @@ ENGLISH_OPTIMISTIC = ContentPack(
             template="Your {quality} will lead you toward {outcome}.",
             components={
                 "quality": (
-                    "patience",
-                    "curiosity",
-                    "persistence",
+                    ComponentValue("patience"),
+                    ComponentValue("curiosity"),
+                    ComponentValue("persistence"),
                 ),
                 "outcome": (
-                    "an unexpected opportunity",
-                    "a useful discovery",
-                    "a fortunate change",
+                    ComponentValue("an unexpected opportunity"),
+                    ComponentValue("a useful discovery"),
+                    ComponentValue("a fortunate change"),
                 ),
             },
         ),
