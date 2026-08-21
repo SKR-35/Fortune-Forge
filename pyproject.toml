@@ -2,11 +2,11 @@
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "fortuneforge"
 version = "1.0.0"
 description = "Offline multilingual fortune-cookie generator with printable PDF output."
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = [
     "reportlab>=4.2,<5",
