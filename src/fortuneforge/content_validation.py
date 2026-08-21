@@ -49,10 +49,23 @@ def validate_template_content(template_content: TemplateContent) -> None:
             )
 
         for value in values:
-            if not value.strip():
+            if not value.text.strip():
                 raise ContentValidationError(
                     f"Component field '{field_name}' contains an empty value."
                 )
+                
+            for tag in value.tags:
+                if ":" not in tag:
+                    raise ContentValidationError(
+                    f"Component field '{field_name}' contains malformed tag '{tag}'."
+                    )
+
+                prefix, name = tag.split(":", 1)
+
+                if prefix not in {"provides", "requires", "excludes"} or not name:
+                    raise ContentValidationError(
+                        f"Component field '{field_name}' contains malformed tag '{tag}'."
+                    )
 
 
 def validate_content_pack(content_pack: ContentPack) -> None:
