@@ -2,7 +2,13 @@
 
 import pytest
 
-from fortuneforge.content import ComponentValue, ContentPack, TemplateContent
+import fortuneforge.generator as generator
+from fortuneforge.content import (
+    ComponentValue,
+    ContentPack,
+    TemplateContent,
+    get_content_pack,
+)
 from fortuneforge.content_validation import ContentValidationError
 from fortuneforge.domain import GenerationRequest, Language, Mood
 from fortuneforge.generator import (
@@ -198,3 +204,22 @@ def test_generation_rejects_structurally_invalid_content(
 
     with pytest.raises(ContentValidationError):
         generate_batch(request)
+
+
+def test_candidate_pool_rejects_fortunes_that_do_not_fit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    content_pack = get_content_pack(
+        Language.ENGLISH,
+        Mood.OPTIMISTIC,
+    )
+
+    monkeypatch.setattr(
+        generator,
+        "fortune_fits",
+        lambda fortune, *, font_name: False,
+    )
+
+    candidates = generator.build_candidate_pool(content_pack)
+
+    assert candidates == []
