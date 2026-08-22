@@ -1,7 +1,7 @@
 """FortuneForge desktop application."""
 
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 
 from fortuneforge.domain import GenerationRequest, Language, Mood
 from fortuneforge.generator import GenerationError, generate_batch
@@ -221,6 +221,18 @@ class FortuneForgeApp:
             pady=(8, 0),
         )
 
+        self.export_txt_button = ttk.Button(
+            preview_frame,
+            text="Export TXT",
+            command=self._export_txt,
+        )
+        self.export_txt_button.grid(
+            row=1,
+            column=1,
+            sticky="e",
+            pady=(8, 0),
+        )
+
     def _parse_quantity(self) -> int:
         """Parse and validate the quantity control."""
         raw_value = self.quantity_var.get().strip()
@@ -310,6 +322,44 @@ class FortuneForgeApp:
             self.status_var.set("1 fortune in current preview.")
         else:
             self.status_var.set(f"{count} fortunes in current preview.")
+
+    def _export_txt(self) -> None:
+        """Export the current preview batch as a UTF-8 text file."""
+        if not self.preview_batch:
+            messagebox.showerror(
+                "Nothing to export",
+                "Generate a fortune batch before exporting.",
+                parent=self.root,
+            )
+            return
+
+        file_path = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Export fortunes as text",
+            defaultextension=".txt",
+            filetypes=(("Text files", "*.txt"),),
+        )
+
+        if not file_path:
+            return
+
+        try:
+            content = "\n".join(self.preview_batch) + "\n"
+            with open(file_path, "w", encoding="utf-8", newline="\n") as file:
+                file.write(content)
+        except OSError as exc:
+            messagebox.showerror(
+                "Export failed",
+                f"The text file could not be saved.\n\n{exc}",
+                parent=self.root,
+            )
+            return
+
+        messagebox.showinfo(
+            "Export complete",
+            "The fortune batch was exported successfully.",
+            parent=self.root,
+        )
 
 
 def build_app() -> tk.Tk:
