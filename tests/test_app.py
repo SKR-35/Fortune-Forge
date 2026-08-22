@@ -12,6 +12,7 @@ from fortuneforge.app import (
 )
 from fortuneforge.domain import Language, Mood
 from fortuneforge.generator import GenerationError
+from fortuneforge.pdf_export import PdfExportError
 
 
 @pytest.fixture
@@ -270,3 +271,85 @@ def test_text_export_write_failure_preserves_preview(
     assert app.preview_batch == batch
     assert len(errors) == 1
     assert errors[0][0][0] == "Export failed"
+
+
+def test_pdf_export_uses_current_preview(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    batch = (
+        "First fortune.",
+        "Second fortune.",
+    )
+    app.preview_batch = batch
+
+    output_path = tmp_path / "fortunes.pdf"
+    exported: list[tuple[tuple[str, ...], str]] = []
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: str(output_path),
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.export_pdf",
+        lambda fortunes, path: exported.append((fortunes, path)),
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showinfo",
+        lambda *args, **kwargs: None,
+    )
+
+    app._export_pdf()
+
+    assert exported == [(batch, str(output_path))]
+
+
+def test_pdf_export_without_preview_shows_error(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    errors: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showerror",
+        lambda *args, **kwargs: errors.append((args, kwargs)),
+    )
+
+    app._export_pdf()
+
+    assert len(errors) == 1
+    assert errors[0][0][0] == "Nothing to export"
+
+
+def test_pdf_export_failure_preserves_preview(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    batch = (
+        "First fortune.",
+        "Second fortune.",
+    )
+    app.preview_batch = batch
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: str(tmp_path / "fortunes.pdf"),
+    )
+
+    def fail_export(*args: object, **kwargs: object) -> None:
+        raise PdfExportError("PDF export failed for testing.")
+
+    monkeypatch.setattr(
+        "fortuneforge.app.export_pdf",
+        fail_export,
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showerror",
+        lambda *args, **kwargs: None,
+    )
+
+    app._export_pdf()
+
+    assert app.preview_batch == batch
