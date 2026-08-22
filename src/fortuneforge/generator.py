@@ -8,6 +8,7 @@ from fortuneforge.content import ContentPack, TemplateContent, get_content_pack
 from fortuneforge.content_validation import validate_content_pack
 from fortuneforge.domain import GenerationRequest
 from fortuneforge.normalization import normalize_fortune
+from fortuneforge.pdf_export import fortune_fits, register_pdf_font
 from fortuneforge.quality import is_quality_candidate
 
 
@@ -47,10 +48,17 @@ def _expand_template(template_content: TemplateContent) -> list[str]:
 def build_candidate_pool(content_pack: ContentPack) -> list[str]:
     """Build the unique candidate pool for a content pack."""
     unique_candidates: dict[str, str] = {}
+    font_name = register_pdf_font()
 
     for template_content in content_pack.templates:
         for fortune in _expand_template(template_content):
             if not is_quality_candidate(fortune):
+                continue
+
+            if not fortune_fits(
+                fortune,
+                font_name=font_name,
+            ):
                 continue
 
             normalized = normalize_fortune(fortune)
