@@ -27,8 +27,12 @@ class FortuneForgeApp:
 
         # Preview state is deliberately separate from control state.
         # Changing controls must not change the last successfully generated batch.
+        self.generated_batch: tuple[str, ...] = ()
         self.preview_batch: tuple[str, ...] = ()
 
+        self.selection_vars: list[tk.BooleanVar] = []
+        self.fortune_labels: list[ttk.Label] = []
+        self.select_all_var = tk.BooleanVar(value=True)
         self.language_var = tk.StringVar(value=DEFAULT_LANGUAGE.value)
         self.mood_var = tk.StringVar(value=DEFAULT_MOOD.value)
         self.quantity_var = tk.StringVar(value=str(DEFAULT_QUANTITY))
@@ -179,18 +183,41 @@ class FortuneForgeApp:
         )
         preview_frame.pack(fill="both", expand=True)
 
-        preview_frame.rowconfigure(0, weight=1)
+        preview_frame.rowconfigure(1, weight=1)
         preview_frame.columnconfigure(0, weight=1)
 
-        self.preview_text = tk.Text(
-            preview_frame,
-            wrap="word",
-            state="disabled",
-            padx=10,
-            pady=10,
-        )
-        self.preview_text.grid(
+        selection_controls = ttk.Frame(preview_frame)
+        selection_controls.grid(
             row=0,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=(0, 8),
+        )
+
+        self.select_all_checkbutton = ttk.Checkbutton(
+            selection_controls,
+            text="Select all",
+            variable=self.select_all_var,
+            command=self._toggle_select_all,
+            state="disabled",
+        )
+        self.select_all_checkbutton.pack(side="left")
+
+        self.apply_selection_button = ttk.Button(
+            selection_controls,
+            text="Apply Selection",
+            command=self._apply_selection,
+            state="disabled",
+        )
+        self.apply_selection_button.pack(side="right")
+
+        self.preview_canvas = tk.Canvas(
+            preview_frame,
+            highlightthickness=0,
+        )
+        self.preview_canvas.grid(
+            row=1,
             column=0,
             sticky="nsew",
         )
@@ -198,15 +225,35 @@ class FortuneForgeApp:
         scrollbar = ttk.Scrollbar(
             preview_frame,
             orient="vertical",
-            command=self.preview_text.yview,
+            command=self.preview_canvas.yview,
         )
         scrollbar.grid(
-            row=0,
+            row=1,
             column=1,
             sticky="ns",
         )
 
-        self.preview_text.configure(yscrollcommand=scrollbar.set)
+        self.preview_canvas.configure(
+            yscrollcommand=scrollbar.set,
+        )
+
+        self.preview_list_frame = ttk.Frame(self.preview_canvas)
+
+        self.preview_window = self.preview_canvas.create_window(
+            (0, 0),
+            window=self.preview_list_frame,
+            anchor="nw",
+        )
+
+        self.preview_list_frame.bind(
+            "<Configure>",
+            self._on_preview_frame_configure,
+        )
+
+        self.preview_canvas.bind(
+            "<Configure>",
+            self._on_preview_canvas_configure,
+        )
 
         self.status_var = tk.StringVar(value="No batch generated yet.")
 
@@ -215,7 +262,7 @@ class FortuneForgeApp:
             textvariable=self.status_var,
         )
         status_label.grid(
-            row=1,
+            row=2,
             column=0,
             columnspan=2,
             sticky="w",
@@ -224,7 +271,7 @@ class FortuneForgeApp:
 
         export_frame = ttk.Frame(preview_frame)
         export_frame.grid(
-            row=1,
+            row=2,
             column=1,
             sticky="e",
             pady=(8, 0),
@@ -246,6 +293,65 @@ class FortuneForgeApp:
             command=self._export_pdf,
         )
         self.export_pdf_button.pack(side="left")
+
+    def _on_preview_frame_configure(self, event: tk.Event) -> None:
+        """Update the canvas scroll region when preview content changes."""
+        self.preview_canvas.configure(scrollregion=self.preview_canvas.bbox("all"))
+
+    def _on_preview_canvas_configure(self, event: tk.Event) -> None:
+        """Keep the preview list and wrapped text aligned with the canvas."""
+        self.preview_canvas.itemconfigure(
+            self.preview_window,
+            width=event.width,
+        )
+
+        self._update_fortune_wraplengths()
+
+    def _update_fortune_wraplengths(self) -> None:
+        """Wrap fortune labels to the current visible preview width."""
+        wrap_width = max(self.preview_canvas.winfo_width() - 90, 100)
+
+        for fortune_label in self.fortune_labels:
+            fortune_label.configure(
+                wraplength=wrap_width,
+            )
+
+    def _toggle_select_all(self) -> None:
+        """Select or deselect all fortunes in the current preview."""
+        selected = self.select_all_var.get()
+
+        for selection_var in self.selection_vars:
+            selection_var.set(selected)
+
+    def _sync_select_all_state(self) -> None:
+        """Synchronize Select All with the individual fortune selections."""
+        all_selected = bool(self.selection_vars) and all(
+            selection_var.get() for selection_var in self.selection_vars
+        )
+        self.select_all_var.set(all_selected)
+
+    def _apply_selection(self) -> None:
+        """Keep only the selected fortunes in the committed preview."""
+        selected_fortunes = tuple(
+            fortune
+            for fortune, selection_var in zip(
+                self.preview_batch,
+                self.selection_vars,
+                strict=True,
+            )
+            if selection_var.get()
+        )
+
+        if not selected_fortunes:
+            messagebox.showerror(
+                "No fortunes selected",
+                "Select at least one fortune before applying the selection.",
+                parent=self.root,
+            )
+            return
+
+        self.preview_batch = selected_fortunes
+        self._render_preview()
 
     def _parse_quantity(self) -> int:
         """Parse and validate the quantity control."""
@@ -313,22 +419,61 @@ class FortuneForgeApp:
             return
 
         # Only commit preview state after the entire generation succeeds.
+        self.generated_batch = new_batch
         self.preview_batch = new_batch
         self._render_preview()
 
     def _render_preview(self) -> None:
-        """Render the committed preview batch without making it editable."""
-        self.preview_text.configure(state="normal")
-        self.preview_text.delete("1.0", tk.END)
+        """Render the current preview batch as selectable fortunes."""
+        for child in self.preview_list_frame.winfo_children():
+            child.destroy()
+
+        self.selection_vars = []
+        self.fortune_labels = []
 
         for index, fortune in enumerate(self.preview_batch, start=1):
-            self.preview_text.insert(
-                tk.END,
-                f"{index}. {fortune}\n\n",
+            selected_var = tk.BooleanVar(value=True)
+            self.selection_vars.append(selected_var)
+
+            row_frame = ttk.Frame(self.preview_list_frame)
+            row_frame.pack(
+                fill="x",
+                padx=8,
+                pady=4,
             )
 
-        self.preview_text.configure(state="disabled")
-        self.preview_text.yview_moveto(0)
+            checkbutton = ttk.Checkbutton(
+                row_frame,
+                variable=selected_var,
+                command=self._sync_select_all_state,
+            )
+
+            checkbutton.pack(
+                side="left",
+                anchor="n",
+            )
+
+            fortune_label = ttk.Label(
+                row_frame,
+                text=f"{index}. {fortune}",
+                justify="left",
+            )
+
+            self.fortune_labels.append(fortune_label)
+
+            fortune_label.pack(
+                side="left",
+                fill="x",
+                expand=True,
+                padx=(4, 0),
+            )
+
+        self.preview_canvas.update_idletasks()
+        self._update_fortune_wraplengths()
+
+        self.select_all_var.set(True)
+        self.select_all_checkbutton.configure(state="normal")
+        self.apply_selection_button.configure(state="normal")
 
         count = len(self.preview_batch)
 
