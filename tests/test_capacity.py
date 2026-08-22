@@ -3,6 +3,7 @@
 from fortuneforge.capacity import CapacityReport, analyze_capacity
 from fortuneforge.content import (
     ENGLISH_HUMOROUS,
+    ENGLISH_OMINOUS,
     ENGLISH_OPTIMISTIC,
     ENGLISH_PESSIMISTIC,
     ComponentValue,
@@ -103,5 +104,11 @@ def test_english_humorous_supports_required_capacity() -> None:
 
 def test_english_pessimistic_supports_required_capacity() -> None:
     report = analyze_capacity(ENGLISH_PESSIMISTIC)
+
+    assert report.candidate_count >= 500
+
+
+def test_english_ominous_supports_required_capacity() -> None:
+    report = analyze_capacity(ENGLISH_OMINOUS)
 
     assert report.candidate_count >= 500
