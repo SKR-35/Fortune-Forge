@@ -117,14 +117,13 @@ def test_generation_failure_preserves_existing_preview(
     assert app.status_var.get() == "2 fortunes in current preview."
 
 
-def test_preview_is_read_only_after_render(
-    app: FortuneForgeApp,
-) -> None:
+def test_preview_renders_noneditable_labels(app: FortuneForgeApp) -> None:
     app.preview_batch = ("A good opportunity is approaching.",)
 
     app._render_preview()
 
-    assert app.preview_text.cget("state") == "disabled"
+    assert len(app.fortune_labels) == 1
+    assert app.fortune_labels[0].cget("text") == ("1. A good opportunity is approaching.")
 
 
 def test_preview_preserves_batch_order(
@@ -138,10 +137,13 @@ def test_preview_preserves_batch_order(
 
     app._render_preview()
 
-    rendered = app.preview_text.get("1.0", "end-1c")
+    rendered_texts = [label.cget("text") for label in app.fortune_labels]
 
-    assert rendered.index("First fortune.") < rendered.index("Second fortune.")
-    assert rendered.index("Second fortune.") < rendered.index("Third fortune.")
+    assert rendered_texts == [
+        "1. First fortune.",
+        "2. Second fortune.",
+        "3. Third fortune.",
+    ]
 
 
 def test_text_export_writes_current_preview_in_order(
@@ -353,3 +355,104 @@ def test_pdf_export_failure_preserves_preview(
     app._export_pdf()
 
     assert app.preview_batch == batch
+
+    def test_select_all_selects_every_fortune(app: FortuneForgeApp) -> None:
+
+        app.preview_batch = ("First.", "Second.", "Third.")
+        app._render_preview()
+
+        app.select_all_var.set(False)
+        app._toggle_select_all()
+
+        assert not any(var.get() for var in app.selection_vars)
+
+        app.select_all_var.set(True)
+        app._toggle_select_all()
+
+        assert all(var.get() for var in app.selection_vars)
+
+    def test_individual_selection_updates_select_all_state(
+        app: FortuneForgeApp,
+    ) -> None:
+        app.preview_batch = ("First.", "Second.", "Third.")
+        app._render_preview()
+
+        app.selection_vars[1].set(False)
+        app._sync_select_all_state()
+
+        assert app.select_all_var.get() is False
+
+        app.selection_vars[1].set(True)
+        app._sync_select_all_state()
+
+        assert app.select_all_var.get() is True
+
+    def test_apply_selection_keeps_only_selected_fortunes(
+        app: FortuneForgeApp,
+    ) -> None:
+        app.generated_batch = ("First.", "Second.", "Third.")
+        app.preview_batch = ("First.", "Second.", "Third.")
+        app._render_preview()
+
+        app.selection_vars[1].set(False)
+
+        app._apply_selection()
+
+        assert app.generated_batch == ("First.", "Second.", "Third.")
+        assert app.preview_batch == ("First.", "Third.")
+        assert len(app.selection_vars) == 2
+        assert all(var.get() for var in app.selection_vars)
+
+    def test_apply_selection_preserves_original_order(
+        app: FortuneForgeApp,
+    ) -> None:
+        app.preview_batch = ("First.", "Second.", "Third.", "Fourth.")
+        app._render_preview()
+
+        app.selection_vars[0].set(False)
+        app.selection_vars[2].set(False)
+
+        app._apply_selection()
+
+        assert app.preview_batch == ("Second.", "Fourth.")
+
+    def test_apply_empty_selection_preserves_preview(
+        app: FortuneForgeApp,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        batch = ("First.", "Second.", "Third.")
+        app.preview_batch = batch
+        app._render_preview()
+
+        for selection_var in app.selection_vars:
+            selection_var.set(False)
+
+        errors: list[str] = []
+
+        monkeypatch.setattr(
+            "fortuneforge.app.messagebox.showerror",
+            lambda title, message, **kwargs: errors.append(message),
+        )
+
+        app._apply_selection()
+
+        assert app.preview_batch == batch
+        assert len(errors) == 1
+        assert "Select at least one fortune" in errors[0]
+
+    def test_generation_preserves_complete_generated_batch(
+        app: FortuneForgeApp,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        batch = ("First.", "Second.", "Third.")
+
+        monkeypatch.setattr(
+            "fortuneforge.app.generate_batch",
+            lambda request: batch,
+        )
+
+        app._generate()
+
+        assert app.generated_batch == batch
+        assert app.preview_batch == batch
+        assert all(var.get() for var in app.selection_vars)
