@@ -5,6 +5,7 @@ from tkinter import filedialog, messagebox, ttk
 
 from fortuneforge.domain import GenerationRequest, Language, Mood
 from fortuneforge.generator import GenerationError, generate_batch
+from fortuneforge.pdf_export import PdfExportError, export_pdf
 
 APP_TITLE = "FortuneForge"
 WINDOW_WIDTH = 820
@@ -221,17 +222,30 @@ class FortuneForgeApp:
             pady=(8, 0),
         )
 
-        self.export_txt_button = ttk.Button(
-            preview_frame,
-            text="Export TXT",
-            command=self._export_txt,
-        )
-        self.export_txt_button.grid(
+        export_frame = ttk.Frame(preview_frame)
+        export_frame.grid(
             row=1,
             column=1,
             sticky="e",
             pady=(8, 0),
         )
+
+        self.export_txt_button = ttk.Button(
+            export_frame,
+            text="Export TXT",
+            command=self._export_txt,
+        )
+        self.export_txt_button.pack(
+            side="left",
+            padx=(0, 8),
+        )
+
+        self.export_pdf_button = ttk.Button(
+            export_frame,
+            text="Export PDF",
+            command=self._export_pdf,
+        )
+        self.export_pdf_button.pack(side="left")
 
     def _parse_quantity(self) -> int:
         """Parse and validate the quantity control."""
@@ -358,6 +372,45 @@ class FortuneForgeApp:
         messagebox.showinfo(
             "Export complete",
             "The fortune batch was exported successfully.",
+            parent=self.root,
+        )
+
+    def _export_pdf(self) -> None:
+        """Export the current preview batch as printable A4 PDF slips."""
+        if not self.preview_batch:
+            messagebox.showerror(
+                "Nothing to export",
+                "Generate a fortune batch before exporting.",
+                parent=self.root,
+            )
+            return
+
+        file_path = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Export printable fortune PDF",
+            defaultextension=".pdf",
+            filetypes=(("PDF files", "*.pdf"),),
+        )
+
+        if not file_path:
+            return
+
+        try:
+            export_pdf(
+                self.preview_batch,
+                file_path,
+            )
+        except PdfExportError as exc:
+            messagebox.showerror(
+                "PDF export failed",
+                str(exc),
+                parent=self.root,
+            )
+            return
+
+        messagebox.showinfo(
+            "Export complete",
+            "The printable fortune PDF was exported successfully.",
             parent=self.root,
         )
 

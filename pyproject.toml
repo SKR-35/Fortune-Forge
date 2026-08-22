@@ -28,6 +28,13 @@ fortuneforge = "fortuneforge.app:main"
 where = ["src"]
 
 
+[tool.setuptools.package-data]
+fortuneforge = [
+    "assets/fonts/*.ttf",
+    "assets/fonts/*.txt",
+]
+
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
