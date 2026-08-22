@@ -1,5 +1,7 @@
 """Tests for FortuneForge content capacity analysis."""
 
+import pytest
+
 from fortuneforge.capacity import CapacityReport, analyze_capacity
 from fortuneforge.content import (
     ENGLISH_HUMOROUS,
@@ -10,7 +12,8 @@ from fortuneforge.content import (
     ContentPack,
     TemplateContent,
 )
-from fortuneforge.domain import Language, Mood
+from fortuneforge.domain import GenerationRequest, Language, Mood
+from fortuneforge.generator import generate_batch
 
 
 def test_capacity_report_passes_at_required_capacity() -> None:
@@ -112,3 +115,26 @@ def test_english_ominous_supports_required_capacity() -> None:
     report = analyze_capacity(ENGLISH_OMINOUS)
 
     assert report.candidate_count >= 500
+
+
+@pytest.mark.parametrize(
+    "mood",
+    [
+        Mood.HUMOROUS,
+        Mood.OPTIMISTIC,
+        Mood.PESSIMISTIC,
+        Mood.OMINOUS,
+    ],
+)
+def test_each_english_mood_generates_full_500_batch(mood: Mood) -> None:
+    request = GenerationRequest(
+        language=Language.ENGLISH,
+        mood=mood,
+        quantity=500,
+        seed=3333,
+    )
+
+    batch = generate_batch(request)
+
+    assert len(batch) == 500
+    assert len(set(batch)) == 500
