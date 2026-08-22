@@ -141,3 +141,132 @@ def test_preview_preserves_batch_order(
 
     assert rendered.index("First fortune.") < rendered.index("Second fortune.")
     assert rendered.index("Second fortune.") < rendered.index("Third fortune.")
+
+
+def test_text_export_writes_current_preview_in_order(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    batch = (
+        "First fortune.",
+        "Second fortune.",
+        "Third fortune.",
+    )
+    app.preview_batch = batch
+    app._render_preview()
+
+    output_path = tmp_path / "fortunes.txt"
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: str(output_path),
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showinfo",
+        lambda *args, **kwargs: None,
+    )
+
+    app._export_txt()
+
+    assert output_path.read_text(encoding="utf-8") == (
+        "First fortune.\nSecond fortune.\nThird fortune.\n"
+    )
+
+
+def test_text_export_uses_preview_snapshot_after_controls_change(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    batch = (
+        "Fortune one.",
+        "Fortune two.",
+    )
+    app.preview_batch = batch
+    app._render_preview()
+
+    app.mood_var.set(Mood.OMINOUS.value)
+    app.quantity_var.set("500")
+    app.seed_var.set("-42")
+
+    output_path = tmp_path / "fortunes.txt"
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: str(output_path),
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showinfo",
+        lambda *args, **kwargs: None,
+    )
+
+    app._export_txt()
+
+    assert output_path.read_text(encoding="utf-8") == ("Fortune one.\nFortune two.\n")
+
+
+def test_text_export_cancel_creates_no_file(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    app.preview_batch = ("Fortune one.",)
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: "",
+    )
+
+    app._export_txt()
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_text_export_without_preview_shows_error(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    errors: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showerror",
+        lambda *args, **kwargs: errors.append((args, kwargs)),
+    )
+
+    app._export_txt()
+
+    assert len(errors) == 1
+    assert errors[0][0][0] == "Nothing to export"
+
+
+def test_text_export_write_failure_preserves_preview(
+    app: FortuneForgeApp,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    batch = (
+        "Fortune one.",
+        "Fortune two.",
+    )
+    app.preview_batch = batch
+    app._render_preview()
+
+    output_path = tmp_path / "missing" / "fortunes.txt"
+
+    errors: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    monkeypatch.setattr(
+        "fortuneforge.app.filedialog.asksaveasfilename",
+        lambda **kwargs: str(output_path),
+    )
+    monkeypatch.setattr(
+        "fortuneforge.app.messagebox.showerror",
+        lambda *args, **kwargs: errors.append((args, kwargs)),
+    )
+
+    app._export_txt()
+
+    assert app.preview_batch == batch
+    assert len(errors) == 1
+    assert errors[0][0][0] == "Export failed"
